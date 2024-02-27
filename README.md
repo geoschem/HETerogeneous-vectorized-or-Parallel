@@ -1,1 +1,1 @@
-# HETerogeneous-vectorized-or-Parallel
+# HETP: HETerogeneous-vectorized-or-Parallel 
