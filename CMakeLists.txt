@@ -4,6 +4,21 @@ cmake_minimum_required(VERSION 3.5)
 project(HETP VERSION 77 LANGUAGES Fortran)
 
 #-----------------------------------------------------------------------------
+# Add CMakeScripts/ to the module path
+#-----------------------------------------------------------------------------
+list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/CMakeScripts)
+include(HETP-Helpers)
+
+#-----------------------------------------------------------------------------
+# Print header
+#-----------------------------------------------------------------------------
+get_repo_version(HETP_REPO_VERSION ${CMAKE_CURRENT_SOURCE_DIR})
+message("=================================================================")
+message("HETP ${PROJECT_VERSION}")
+message("Current status: ${HETP_REPO_VERSION}")
+message("=================================================================")
+
+#-----------------------------------------------------------------------------
 # Set policies
 #-----------------------------------------------------------------------------
 cmake_policy(SET CMP0054 NEW)
@@ -100,7 +115,7 @@ target_include_directories(HETPBuildProperties
 )
 
 #-----------------------------------------------------------------------------
-# For HETP standalone testing
+# For HETP testing
 #
 # This conditional block configures the HETP build for HETP standalone test.
 # It sets HETP_EXE_TARGETS and it configures the HETPBuildProperties.
@@ -137,10 +152,6 @@ if(NOT HETP_EXTERNAL_CONFIG)
     elseif(NOT EXISTS RUNDIR)
         set(RUNDIR ${CMAKE_BINARY_DIR})
         set(BUILD_WITHOUT_RUNDIR TRUE)
-    else()
-        message(FATAL_ERROR "Your run directory doesn't
-                have HETP_sa_Spec.rc! Set RUNDIR to a
-                valid run directory.")
     endif()
 
     # Determine which executables should be built
