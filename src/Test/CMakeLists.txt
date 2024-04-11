@@ -1,4 +1,4 @@
-# HETP/src/test/CMakeLists.txt
+# HETP/src/Test/CMakeLists.txt
 
 add_library(HETP_Test STATIC EXCLUDE_FROM_ALL
 	hetp_main.F90
