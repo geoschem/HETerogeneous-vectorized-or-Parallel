@@ -115,8 +115,13 @@ program hv_main
 ! [13] Ca++(aq)    [14] Free Ca     [15] K+(aq)     [16] Free K
 ! [17] Mg++(aq)    [18] Free Mg     [19] ALWC       [20] H+
 ! [21] OH-         [22] Case Number
-   open(unit=51, file='/.../alloutput_hv.txt', status='replace')
-   write(51, 22), so4, hso4, caso4, frso4, nh4, nh3, no3,       &
+! ewl debug: do not write to file. write to screen instead.
+!   open(unit=51, file='/.../alloutput_hv.txt', status='replace')
+!   write(51, 22), so4, hso4, caso4, frso4, nh4, nh3, no3,       &
+!                  hno3, cl, hcl, na, frna, ca, frca, k,         &
+!                  frk, mg, frmg, lwc, h, oh, case_number	
+!  22         format(1x, 22(1x, e20.14))     
+   write(*, 22), so4, hso4, caso4, frso4, nh4, nh3, no3,       &
                   hno3, cl, hcl, na, frna, ca, frca, k,         &
                   frk, mg, frmg, lwc, h, oh, case_number	
   22         format(1x, 22(1x, e20.14))     
