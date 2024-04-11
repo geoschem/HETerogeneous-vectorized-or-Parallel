@@ -1,7 +1,27 @@
 # HETP/CMakeLists.txt
 
 cmake_minimum_required(VERSION 3.5)
-project(HETP VERSION 77 LANGUAGES Fortran)
+project(HETP
+  VERSION 1.0
+  LANGUAGES Fortran
+)
+
+#-----------------------------------------------------------------------------
+# Set CMake policies.  For more information, see:
+#
+# https://cmake.org/cmake/help/latest/policy/CMP0054.html
+# https://cmake.org/cmake/help/latest/policy/CMP0057.html
+# https://cmake.org/cmake/help/latest/policy/CMP0074.html
+# https://cmake.org/cmake/help/latest/policy/CMP0079.html
+#-----------------------------------------------------------------------------
+cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0057 NEW)
+if(POLICY CMP0074)
+  cmake_policy(SET CMP0074 NEW)
+endif()
+if(POLICY CMP0079)
+  cmake_policy(SET CMP0079 NEW)
+endif()
 
 #-----------------------------------------------------------------------------
 # Add CMakeScripts/ to the module path
@@ -10,28 +30,14 @@ list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_CURRENT_SOURCE_DIR}/CMakeScripts)
 include(HETP-Helpers)
 
 #-----------------------------------------------------------------------------
-# Print header
+# Print header with the CMake project version and the HETP repo version
 #-----------------------------------------------------------------------------
-get_repo_version(HETP_REPO_VERSION ${CMAKE_CURRENT_SOURCE_DIR})
 message("=================================================================")
 message("HETP ${PROJECT_VERSION}")
-message("Current status: ${HETP_REPO_VERSION}")
 message("=================================================================")
 
 #-----------------------------------------------------------------------------
-# Set policies
-#-----------------------------------------------------------------------------
-cmake_policy(SET CMP0054 NEW)
-cmake_policy(SET CMP0057 NEW)
-if(POLICY CMP0074)
-    cmake_policy(SET CMP0074 NEW)
-endif()
-if(POLICY CMP0079)
-    cmake_policy(SET CMP0079 NEW)
-endif()
-
-#-----------------------------------------------------------------------------
-# Declare the HETPBuildProperties library
+# Declare the HETPBuildProperties
 #-----------------------------------------------------------------------------
 add_library(HETPBuildProperties INTERFACE)
 
@@ -44,6 +50,13 @@ add_library(HETPBuildProperties INTERFACE)
 # Valid COMPILER_ID: Intel and GNU
 # Valid CONFIG: RELEASE, DEBUG, RELWITHDEBINFO
 #---------------------------------------------------------------------
+set(HETP_DETECTED_FORTRAN_COMPILER_ID ${CMAKE_Fortran_COMPILER_ID}
+    CACHE INTERNAL "Logging the COMPILER_ID to CMakeCache.txt"
+)
+set(HETP_DETECTED_FORTRAN_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION}
+    CACHE INTERNAL "Logging the compiler version to CMakeCache.txt"
+)
+
 set(HETP_Fortran_FLAGS_Intel
    -cpp -w -auto -noalign "SHELL:-convert big_endian" "SHELL:-fp-model source" -mcmodel=medium
    -shared-intel -traceback -DLINUX_IFORT
@@ -136,23 +149,10 @@ if(NOT HETP_EXTERNAL_CONFIG)
     	)
     endif()
 
-    # Set the run directory to one directory up
-    set(RUNDIR ".." CACHE PATH "Path to your run directory")
-    message(STATUS "Bootstrapping  ${RUNDIR}")
-
-    # Make RUNDIR an absolute path
-    get_filename_component(RUNDIR "${RUNDIR}"
-        ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}"
-    )
-
-    # Configure the run directory, if any.
-    set(BUILD_WITHOUT_RUNDIR FALSE)
-    if(EXISTS ${RUNDIR}/HETP_sa_Spec.rc)
-        file(STRINGS ${RUNDIR}/HETP_sa_Spec.rc HETP_SA)
-    elseif(NOT EXISTS RUNDIR)
-        set(RUNDIR ${CMAKE_BINARY_DIR})
-        set(BUILD_WITHOUT_RUNDIR TRUE)
-    endif()
+    # Run directory
+    set(RUNDIR "" CACHE PATH "Path(s) to run directory. Specifies install location.")
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Fake CMAKE_INSTALL_PREFIX" FORCE)
+    set(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT FALSE)
 
     # Determine which executables should be built
     set(HETP_EXE_TARGETS "hetp_test"
@@ -160,6 +160,11 @@ if(NOT HETP_EXTERNAL_CONFIG)
     )
 
 endif()
+
+#-----------------------------------------------------------------------------
+# Add source code directory
+#-----------------------------------------------------------------------------
+add_subdirectory(src)
 
 #-----------------------------------------------------------------------------
 # Write HETPBuildProperties's configuration to a file
@@ -186,6 +191,24 @@ file(WRITE ${CMAKE_BINARY_DIR}/HETPBuildProperties.txt
 )
 
 #-----------------------------------------------------------------------------
-# Add source code directory
-#-----------------------------------------------------------------------------
-add_subdirectory(src)
+# Copy build information files to each RUNDIR and INSTALLCOPY directory
+#----------------------------------------------------------------------------
+set(COMBINED_INSTALL_DIRS "")
+list(APPEND COMBINED_INSTALL_DIRS ${RUNDIR})
+list(APPEND COMBINED_INSTALL_DIRS ${INSTALLCOPY})
+
+# Install to run directories
+foreach(INSTALL_PATH ${COMBINED_INSTALL_DIRS})
+  if(INSTALL_PATH IN_LIST RUNDIR)
+    set(CHECK_IS_RUNDIR TRUE)
+  else()
+    set(CHECK_IS_RUNDIR FALSE)
+  endif()
+
+  # Convert INSTALL_PATH to absolute
+  if(NOT IS_ABSOLUTE "${INSTALL_PATH}")
+    get_filename_component(INSTALL_PATH "${INSTALL_PATH}" ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
+  endif()
+  install(FILES ${CMAKE_BINARY_DIR}/CMakeCache.txt DESTINATION ${INSTALL_PATH}/build_info)
+  #install(PROGRAMS ${CMAKE_SOURCE_DIR}/CMakeScripts/summarize_build DESTINATION ${INSTALL_PATH}/build_info)
+endforeach()
