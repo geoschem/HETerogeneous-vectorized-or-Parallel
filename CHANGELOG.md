@@ -9,7 +9,7 @@
 - Added CMake files to enable cmake build
 - Added CHANGELOG.md to record changes per version
 - Added .gitignore to avoid committing temporary files
-- Added instructions to run standalone test to README
+- Added REAMDE instructions to run standalone test and connect to external models
 - Added github action to test build and display badge in the README
 - Added option to write test inputs and outputs to terminal (commented out by default)
 

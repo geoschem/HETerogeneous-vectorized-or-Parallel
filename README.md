@@ -29,3 +29,7 @@ To run the simple HETP test do the following from a directory that contains the 
 ```
 ./hetp_test
 ```
+
+## How to use HETP in an external model
+
+How to connect HETP to an external model is dependent on the external model's build system. In general, all files needed are stored within the src/Core directory. The simplest way to connect HETP is therefore to add files in that directory to the parent model's build list. If the external model uses CMake you can also connect HETP such that its CMake files are used. To do this you must set parameter HETP_EXTERNAL_CONFIG to TRUE within a CMake file in the parent model. This will bypass compiling the src/Test directory files and creating a HETP standalone executable.
