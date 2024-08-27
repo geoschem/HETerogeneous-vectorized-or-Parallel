@@ -1,6 +1,6 @@
 ## HETP: HETerogeneous-vectorized-or-Parallel 
 
-[![Ubuntu](https://github.com/geoschem/Cloud-J/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/geoschem/HETP/actions/workflows/ubuntu.yml)
+[![Ubuntu](https://github.com/sjmiller204/HETerogeneous-vectorized-or-Parallel/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/sjmiller204/HETerogeneous-vectorized-or-Parallel/actions/workflows/ubuntu.yml)
 
 HETP is an aerosol thermodynamic equilibrium solver written in modern Fortran based on ISORROPIA II (which is written in FORTRAN 77).  HETP solves only the 'forward' metastable state of the NH4+/Na+/Ca2+/K+/Mg2+/SO42–/NO3–/Cl–/H2O system.  The main publication for HETP is avaiable online at:  https://gmd.copernicus.org/preprints/gmd-2023-159/.
 
@@ -24,7 +24,7 @@ If you wish to build HETP with compiler debug flags on simply run the following 
 cmake . -DCMAKE_BUILD_TYPE=Debug
 ```
 
-To run the simple HETP test do the following from the directory that containst the executable. Inputs and outputs will be printed to the terminal screen.
+To run the simple HETP test do the following from a directory that contains the executable. Inputs and outputs will be printed to the terminal screen.
 
 ```
 ./hetp_test
