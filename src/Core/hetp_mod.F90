@@ -49,7 +49,7 @@ CONTAINS
 subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh,    &
                                   so4, hso4, caso4, nh4, nh3, no3, hno3, cl, hcl,  &
                                   na, ca, k, mg, h, oh, lwc, frna, frca, frk, frmg,&
-                                  frso4, case_number)
+                                  frso4, ionic, case_number)
 !
    use mach_hetp_mod     
    implicit none
@@ -88,6 +88,7 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
    real(dp),    intent(out) :: frk     ! Free K  
    real(dp),    intent(out) :: frmg    ! Free Mg
    real(dp),    intent(out) :: frso4   ! Free SO4
+   real(dp),    intent(out) :: ionic   ! Ionic strength 
    real(dp),    intent(out) :: case_number 
 !
 !  ## Equilibrium reactions
@@ -142,6 +143,7 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
    h     = 0.0_dp
    oh    = 0.0_dp
    lwc   = 0.0_dp
+   ionic = 0.0_dp
    frna  = 0.0_dp
    frca  = 0.0_dp
    frk   = 0.0_dp
@@ -191,19 +193,19 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
       if (2.0_dp <= sulrat) then
          case_number = 1.0_dp
          call mach_hetp_calca2(so4, nh4, nh3, hso4, h, oh,          &
-                               lwc, rh, temp, k0, p1, p2, nr)
+                               lwc, rh, temp, k0, p1, p2, nr, ionic)
 !
 !  ## 2. Sulfate rich, no acid (case: calcb4)
       else if (1.0_dp <= sulrat .and. sulrat < 2.0_dp) then
          case_number = 2.0_dp
          call mach_hetp_calcb4(so4, nh4, nh3, hso4, h, lwc,         &
-                               rh, temp, k0, p1, p2, nr)
+                               rh, temp, k0, p1, p2, nr, ionic)
 !
 !  ## 3. Sulfate rich, free acid (case: calcc2)
       else if (sulrat < 1.0_dp) then
          case_number = 3.0_dp
          call mach_hetp_calcc2(so4, nh4, nh3, hso4, h, lwc,         &
-                               rh, temp, k0, p1, p2, nr)           
+                               rh, temp, k0, p1, p2, nr, ionic)           
       end if
 !
 !  ### Branch 2 ###
@@ -225,19 +227,19 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
       if (2.0_dp <= sulrat) then
          case_number = 4.0_dp
          call mach_hetp_calcd3(so4, nh4, hno3, nh3, hso4, h, no3, &
-                               lwc, rh, temp, k0, p1, p2, nr)
+                               lwc, rh, temp, k0, p1, p2, nr, ionic)
 !
 !  ## 5. Sulfate rich, no acid (case: calce4)
       else if (1.0_dp <= sulrat .and. sulrat < 2.0_dp) then
          case_number = 5.0_dp
          call mach_hetp_calce4(so4, nh4, hno3, hso4, h, no3,       &
-                               lwc, rh, temp, k0, p1, p2, nr)
+                               lwc, rh, temp, k0, p1, p2, nr, ionic)
 !
 !  ## 6. Sulfate rich, free acid (case: calcf2)
       elseif (sulrat < 1.0_dp) then
          case_number = 6.0_dp
          call mach_hetp_calcf2(so4, nh4, hno3, hso4, h, no3,       &
-                               lwc, rh, temp, k0, p1, p2, nr)
+                               lwc, rh, temp, k0, p1, p2, nr, ionic)
       end if
 !
 !  ### Branch 3 ###
@@ -277,28 +279,28 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
          case_number = 7.0_dp
          call mach_hetp_calcg5(so4, nh4, nh3, hno3, hcl, hso4,      &
                                na, cl, no3, h, lwc, rh, temp, k0,   &
-                               p1, p2, nr)
+                               p1, p2, nr, ionic)
 !
 !  ## 8. Sulfate poor and sodium rich (case: calch6)
       else if (sulrat >= 2.0_dp .and. sodrat >= 2.0_dp) then
          case_number = 8.0_dp
          call mach_hetp_calch6(so4, nh4, nh3, hno3, hcl, hso4,      &
                                na, cl, no3, h, lwc, frna, rh,       &
-                               temp, k0, p1, p2, nr)
+                               temp, k0, p1, p2, nr, ionic)
 !
 !  ## 9. Sulfate rich, no acid (case: calci6)
       else if (1.0_dp <= sulrat .and. sulrat < 2.0_dp) then
          case_number = 9.0_dp
          call mach_hetp_calci6(so4, nh4, nh3, hno3, hcl, hso4,      &
                                na, cl, no3, h, lwc, frna, rh,       &
-                               temp, k0, p1, p2, nr)
+                               temp, k0, p1, p2, nr, ionic)
 !
 !  ## 10. Sulfate rich, free acid (case: calcj3)
       else if (sulrat < 1.0_dp) then
          case_number = 10.0_dp
          call mach_hetp_calcj3(so4, nh4, nh3, hno3, hcl, hso4,      &
                                na, cl, no3, h, lwc, rh, temp, k0,   &
-                               p1, p2, nr)
+                               p1, p2, nr, ionic)
       end if
 !
 !  ### Branch 4 ###
@@ -405,7 +407,7 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
          call mach_hetp_calco7(so4, nh4, nh3, hno3, hcl, hso4,      &
                                na, cl, no3, h, lwc, ca, k, mg,      &
                                caso4, frmg, frna, frca, frk, rh,    &          
-                               temp, k0, p1, p2, nr)
+                               temp, k0, p1, p2, nr, ionic)
 !
 !  ## 12-13. Sulfate poor and dust + sodium rich
       else if (so4rat >= 2.0_dp .and. crnarat >= 2.0_dp) then
@@ -414,14 +416,14 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
             call mach_hetp_calcm8(so4, nh4, nh3, hno3, hcl, hso4,  &
                                   na, cl, no3, h, lwc, ca, k, mg,  &
                                   caso4, frca, frmg, frk, frna,    &
-                                  rh, temp, k0, p1, p2, nr)
+                                  rh, temp, k0, p1, p2, nr, ionic)
 !
          else if (crrat > 2.0_dp) then
             case_number = 13.0_dp
             call mach_hetp_calcp13(so4, nh4, nh3, hno3, hcl, hso4, &
                                    na, cl, no3, h, lwc, ca, k, mg, &
                                    caso4, frso4, frmg, frk, frca,  &
-                                   frna, rh, temp, k0, p1, p2, nr)
+                                   frna, rh, temp, k0, p1, p2, nr, ionic)
          end if
 !
 !  ## 14. Sulfate rich (no acid)
@@ -430,14 +432,14 @@ subroutine mach_hetp_main_15cases(TS, TA, TN, TNa, TCl, TCa, TK, TMg, temp, rh, 
          call mach_hetp_calcl9(so4, nh4, nh3, hno3, hcl, hso4,     &
                                na, cl, no3, h, lwc, ca, k, mg,     &
                                caso4, frmg, frk, frca, frna,       &
-                               frso4, rh, temp, k0, p1, p2, nr)
+                               frso4, rh, temp, k0, p1, p2, nr, ionic)
 !
 !  ## 15. Sulfate super rich (free acid)
       else if (so4rat < 1.0_dp) then
          case_number = 15.0_dp
          call mach_hetp_calck4(so4, nh4, nh3, hno3, hcl, hso4,     &
                                na, cl, no3, h, lwc, ca, k, mg,     &
-                               caso4, rh, temp, k0, p1, p2, nr)
+                               caso4, rh, temp, k0, p1, p2, nr, ionic)
       end if
    end if
 !
@@ -465,7 +467,7 @@ end subroutine mach_hetp_main_15cases
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calca2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, oh_i,                &
-                            lwn_i, rh, temp, k0, p1, p2, nr) 
+                            lwn_i, rh, temp, k0, p1, p2, nr, ionic) 
 !
    use mach_hetp_mod
    implicit none
@@ -482,7 +484,8 @@ subroutine mach_hetp_calca2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, oh_i,            
    real(dp),    intent(inout) :: oh_i    
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, oh, lwn, t, aw, so4_t, nh4_t
@@ -636,7 +639,7 @@ subroutine mach_hetp_calca2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, oh_i,            
          end if 
 !
          call mach_hetp_calcact1b(h, nh4_t, so4_t, hso4, lwn, gama, t, soln,   &
-                                  frst, calain, calou)
+                                  frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -835,7 +838,7 @@ subroutine mach_hetp_calca2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, oh_i,            
          end if 
 !
          call mach_hetp_calcact1b(h, nh4_t, so4_t, hso4, lwn, gama, t, soln,   &
-                                  frst, calain, calou)
+                                  frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -922,7 +925,7 @@ end subroutine mach_hetp_calca2
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcb4(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,                &
-                            rh, temp, k0, p1, p2, nr)
+                            rh, temp, k0, p1, p2, nr, ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -938,7 +941,8 @@ subroutine mach_hetp_calcb4(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,           
    real(dp),    intent(inout) :: h_i     
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables:
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, t, aw, tt1, tt2, c1, so4_t, nh4_t
@@ -1073,7 +1077,7 @@ subroutine mach_hetp_calcb4(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,           
       gamin(9)  = gama(9)
       gamin(13) = gama(13)
 !
-      call mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t)
+      call mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t, ionic)
 !
 !  ## Test convergence criterion: max change in the activity coefficients
       errin = 0.0_dp
@@ -1163,7 +1167,7 @@ end subroutine mach_hetp_calcb4
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcc2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,               &
-                            rh, temp, k0, p1, p2, nr)
+                            rh, temp, k0, p1, p2, nr, ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -1179,8 +1183,10 @@ subroutine mach_hetp_calcc2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,           
    real(dp),    intent(inout) :: h_i     
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
-! 
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
+
+   ! 
 !  ## Local variables
    real(dp)      :: so4, nh4, hso4, gnh3, h, lwn, frh2so4, t, aw
    real(dp)      :: khso4, knh3, kh2o, bb, cc, dd, hh, v, errin, tt0
@@ -1286,7 +1292,7 @@ subroutine mach_hetp_calcc2(so4_i, nh4_i, nh3g_i, hso4_i, h_i, lwn_i,           
       gamin(9)  = gama(9)
       gamin(13) = gama(13)
 !
-      call mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t)
+      call mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t, ionic)
 !
 !  ## Test convergence criterion: max change in the activity coefficients
       errin = 0.0_dp
@@ -1361,7 +1367,7 @@ end subroutine mach_hetp_calcc2
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcd3(so4_i, nh4_i, hno3g_i, nh3g_i, hso4_i, h_i, no3_i,              &
-                            lwn_i, rh, temp, k0, p1, p2, nr)
+                            lwn_i, rh, temp, k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -1380,6 +1386,7 @@ subroutine mach_hetp_calcd3(so4_i, nh4_i, hno3g_i, nh3g_i, hso4_i, h_i, no3_i,  
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
    real(dp),    intent   (in) :: temp    
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)     :: so4, nh4, hso4, ghno3, gnh3, gnh3_i, ghno3_i, no3, h, lwn, t, aw, nh4no3, nh42s4
@@ -1678,7 +1685,7 @@ subroutine mach_hetp_calcd3(so4_i, nh4_i, hno3g_i, nh3g_i, hso4_i, h_i, no3_i,  
          end if 
 !
          call mach_hetp_calcact2b(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t, soln,   &
-                                  frst, calain, calou)
+                                  frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -2014,7 +2021,7 @@ subroutine mach_hetp_calcd3(so4_i, nh4_i, hno3g_i, nh3g_i, hso4_i, h_i, no3_i,  
          end if 
 !
          call mach_hetp_calcact2b(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t, soln,    &
-                                  frst, calain, calou)
+                                  frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -2188,7 +2195,7 @@ end subroutine mach_hetp_calcd3
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calce4(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,              &
-                            lwn_i, rh, temp, k0, p1, p2, nr)
+                            lwn_i, rh, temp, k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -2205,7 +2212,8 @@ subroutine mach_hetp_calce4(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,          
    real(dp),    intent(inout) :: no3_i   
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)  :: so4, nh4, hso4, ghno3, no3, h, lwn, t, aw, gama10
@@ -2349,7 +2357,7 @@ subroutine mach_hetp_calce4(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,          
       gamin(10) = gama(10)
       gamin(13) = gama(13)
 !     
-      call mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t)
+      call mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t, ionic)
 !
 !  ## Test convergence criterion: max change in the activity coefficients
       errin = 0.0_dp
@@ -2444,7 +2452,7 @@ end subroutine mach_hetp_calce4
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcf2(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,              &
-                            lwn_i, rh, temp, k0, p1, p2, nr)
+                            lwn_i, rh, temp, k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -2461,7 +2469,8 @@ subroutine mach_hetp_calcf2(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,          
    real(dp),    intent(inout) :: no3_i   
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)  :: so4, nh4, no3, hso4, ghno3, h, lwn, frh2so4, t, aw
@@ -2577,7 +2586,7 @@ subroutine mach_hetp_calcf2(so4_i, nh4_i, hno3g_i, hso4_i, h_i, no3_i,          
       gamin(10) = gama(10)
       gamin(13) = gama(13)
 !
-      call mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t)
+      call mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3_t, lwn, gama, t, ionic)
 !
 !  ## Test convergence criterion: max change in the activity coefficients
       errin = 0.0_dp
@@ -2659,7 +2668,7 @@ end subroutine mach_hetp_calcf2
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcg5(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i, na_i,    &
-                            cl_i, no3_i, h_i, lwn_i, rh, temp, k0, p1, p2, nr)
+                            cl_i, no3_i, h_i, lwn_i, rh, temp, k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -2680,7 +2689,8 @@ subroutine mach_hetp_calcg5(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i, na_i,
    real(dp),    intent(inout) :: h_i     
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)      :: so4, nh4, hso4, gnh3, h, lwn, no3, cl, na, ghno3, ghcl, caso4, t, aw
@@ -2904,7 +2914,7 @@ subroutine mach_hetp_calcg5(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i, na_i,
          end if 
 !
          call mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                                 lwn, gama, t, soln, frst, calain, calou)
+                                 lwn, gama, t, soln, frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -3239,7 +3249,7 @@ subroutine mach_hetp_calcg5(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i, na_i,
          end if 
 !
          call mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                                  lwn, gama, t, soln, frst, calain, calou)
+                                  lwn, gama, t, soln, frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -3420,7 +3430,7 @@ end subroutine mach_hetp_calcg5
 !############################################################################
 subroutine mach_hetp_calch6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, frna_d, rh, temp, k0,    &
-                            p1, p2, nr)
+                            p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -3442,7 +3452,8 @@ subroutine mach_hetp_calch6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(inout) :: lwn_i  
    real(dp),    intent  (out) :: frna_d   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 !
 ! ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, no3, cl, na, ghno3, ghcl, caso4
@@ -3676,7 +3687,7 @@ subroutine mach_hetp_calch6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
          end if 
 !
          call mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                                 lwn, gama, t, soln, frst, calain, calou)
+                                 lwn, gama, t, soln, frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -4000,7 +4011,7 @@ subroutine mach_hetp_calch6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
          end if 
 !
          call mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                                 lwn, gama, t, soln, frst, calain, calou)
+                                 lwn, gama, t, soln, frst, calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -4179,7 +4190,7 @@ end subroutine mach_hetp_calch6
 !############################################################################
 subroutine mach_hetp_calci6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, frna, rh, temp, k0,      &
-                            p1, p2, nr)
+                            p1, p2, nr, ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -4202,6 +4213,7 @@ subroutine mach_hetp_calci6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent  (out) :: frna 
    real(dp),    intent   (in) :: rh      
    real(dp),    intent   (in) :: temp    
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn
@@ -4354,7 +4366,7 @@ subroutine mach_hetp_calci6(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !  ## Reset gamin
       gamin = gama
       call mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                              lwn, gama, t)
+                              lwn, gama, t,ionic)
 !
       errin = 0.0_dp
 !  ## Test for convergence of activity coefficients 
@@ -4439,7 +4451,7 @@ end subroutine mach_hetp_calci6
 !############################################################################
 subroutine mach_hetp_calcj3(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, rh, temp, k0,            &
-                            p1, p2, nr)
+                            p1, p2, nr, ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -4460,7 +4472,8 @@ subroutine mach_hetp_calcj3(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(inout) :: h_i     
    real(dp),    intent(inout) :: lwn_i   
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 !  ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn
@@ -4579,7 +4592,7 @@ subroutine mach_hetp_calcj3(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !
 !  ## Reset gamin
       gamin = gama
-      call mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t, lwn, gama, t)
+      call mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t, lwn, gama, t,ionic)
 !
       errin = 0.0_dp
 !  ## Test for convergence of activity coefficients 
@@ -4668,7 +4681,7 @@ end subroutine mach_hetp_calcj3
 subroutine mach_hetp_calco7(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, ca_i, k_i, mg_i,         &
                             caso4_i, frmg, frna, frca, frk, rh, temp, k0,           &
-                            p1, p2, nr)
+                            p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -4697,7 +4710,8 @@ subroutine mach_hetp_calco7(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(inout) :: frk   
    real(dp),    intent(inout) :: frca 
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 !
 ! ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, caso4, no3, cl, na, ca, pk, mg, ghno3, ghcl
@@ -4956,7 +4970,7 @@ subroutine mach_hetp_calco7(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !
          call mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln, frst,   &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -5307,7 +5321,7 @@ subroutine mach_hetp_calco7(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !
          call mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln, frst,   &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -5493,7 +5507,7 @@ end subroutine mach_hetp_calco7
 subroutine mach_hetp_calcm8(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, ca_i, k_i, mg_i,         &
                             caso4_i, frca, frmg, frk, frna, rh, temp,               &
-                            k0, p1, p2, nr)
+                            k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -5522,7 +5536,8 @@ subroutine mach_hetp_calcm8(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(inout) :: frk 
    real(dp),    intent(inout) :: frca
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 ! 
 ! ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, caso4, no3, cl, na, ca, pk, mg, ghno3, ghcl
@@ -5786,7 +5801,7 @@ subroutine mach_hetp_calcm8(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !
          call mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln, frst,   &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -6102,7 +6117,7 @@ subroutine mach_hetp_calcm8(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !
          call mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln,  frst,  &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -6273,7 +6288,7 @@ end subroutine mach_hetp_calcm8
 subroutine mach_hetp_calcp13(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,         &
                              na_i, cl_i, no3_i, h_i, lwn_i, ca_i, k_i, mg_i,        &
                              caso4_i, frso4, frmg, frk, frca, frna, rh, temp,       &
-                             k0, p1, p2, nr)
+                             k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -6303,7 +6318,8 @@ subroutine mach_hetp_calcp13(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,     
    real(dp),    intent(inout) :: frca   
    real(dp),    intent(inout) :: frna 
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic    
 !
 ! ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, caso4, no3, cl, na, ca, pk, mg, ghno3, ghcl
@@ -6584,7 +6600,7 @@ subroutine mach_hetp_calcp13(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,     
 !
          call mach_hetp_calcact4b( h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,    &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln, frst,   &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -6926,7 +6942,7 @@ subroutine mach_hetp_calcp13(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,     
 !
          call mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,    &
                                   ca_t, pk_t, mg_t, lwn, gama, t, soln, frst,  &
-                                  calain, calou)
+                                  calain, calou, ionic)
 !
          if (frst) then
             errouloc = 0.0_dp
@@ -7110,7 +7126,7 @@ end subroutine mach_hetp_calcp13
 subroutine mach_hetp_calcl9(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, ca_i, k_i, mg_i,         &
                             caso4_i, frmg, frk, frca, frna, frso4, rh, temp, k0,    &
-                            p1, p2, nr)
+                            p1, p2, nr, ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -7140,7 +7156,8 @@ subroutine mach_hetp_calcl9(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(out)   :: frna
    real(dp),    intent(out)   :: frso4
    real(dp),    intent   (in) :: rh      
-   real(dp),    intent   (in) :: temp    
+   real(dp),    intent   (in) :: temp
+   real(dp),    intent(inout) :: ionic
 !
 !  ## Local variables
    real(dp)     :: so4, nh4, hso4, gnh3, h, lwn, caso4
@@ -7347,7 +7364,7 @@ subroutine mach_hetp_calcl9(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !  ## Reset gamin
       gamin = gama
       call mach_hetp_calcact4(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                              ca_t, pk_t, mg_t, lwn, gama, t)
+                              ca_t, pk_t, mg_t, lwn, gama, t, ionic)
 !
 !  ## Test for convergence of activity coefficients 
       errin = 0.0_dp
@@ -7441,7 +7458,7 @@ end subroutine mach_hetp_calcl9
 !############################################################################
 subroutine mach_hetp_calck4(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,          &
                             na_i, cl_i, no3_i, h_i, lwn_i, ca_i, k_i, mg_i,         &
-                            caso4_i, rh, temp, k0, p1, p2, nr)
+                            caso4_i, rh, temp, k0, p1, p2, nr,ionic)
 !
    use mach_hetp_mod
    implicit none
@@ -7467,7 +7484,8 @@ subroutine mach_hetp_calck4(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
    real(dp),    intent(inout) :: caso4_i 
    real(dp),    intent   (in) :: rh      
    real(dp),    intent   (in) :: temp    
-! 
+   real(dp),    intent(inout) :: ionic
+   ! 
 !  ## Local variables
    real(dp)      :: so4, nh4, hso4, gnh3, h, lwn, caso4
    real(dp)      :: no3, cl, na, ca, pk, mg, ghno3, ghcl, t, aw
@@ -7600,7 +7618,7 @@ subroutine mach_hetp_calck4(so4_i, nh4_i, nh3g_i, hno3g_i, hclg_i, hso4_i,      
 !  ## Reset gamin
       gamin = gama
       call mach_hetp_calcact4(h, nh4_t, so4_t, hso4, no3_t, cl_t, na_t,     &
-                              ca_t, pk_t, mg_t, lwn, gama, t)
+                              ca_t, pk_t, mg_t, lwn, gama, t, ionic)
 !
 !  ## Test for convergence of activity coefficients 
       errin = 0.0_dp
@@ -7692,7 +7710,7 @@ end subroutine mach_hetp_calck4
 ! ## Code is based on ISORROPIA II, obtained from the CMAQ air-quality
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
-subroutine mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t)
+subroutine mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t,ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -7704,9 +7722,10 @@ subroutine mach_hetp_calcact1(h, nh4_t, so4_t, hso4, lwn, gama, t)
    real(dp),       intent(in) :: h       
    real(dp),       intent(in) :: t       
    real(dp),       intent(inout) :: gama    (13)
+   real(dp),       intent(inout) :: ionic
 !
 !  ## Local variables
-   real(dp)    :: ionic, sion, tc, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: ff11, ff13, f2a2, f2a3, ch1, ch2
    real(dp)    :: h2, k1, k2, f11, f12
@@ -7835,7 +7854,7 @@ end subroutine mach_hetp_calcact1
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcact1b(h, nh4_t, so4_t, hso4, lwn, gama, t, soln,  &
-                               frst, calain, calou)
+                               frst, calain, calou, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -7850,10 +7869,11 @@ subroutine mach_hetp_calcact1b(h, nh4_t, so4_t, hso4, lwn, gama, t, soln,  &
    logical,        intent(in) :: soln   
    logical,        intent(in) :: frst    
    logical,        intent(in) :: calain  
-   logical,        intent(in) :: calou   
+   logical,        intent(in) :: calou
+   real(dp),       intent(inout):: ionic
 !
 !  ## Local variables
-   real(dp)    :: ionic, sion, tc, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: ff11, ff13, f2a2, f2a3, ch1, ch2
    real(dp)    :: h2, k1, k2, f11, f12
@@ -7984,7 +8004,7 @@ end subroutine mach_hetp_calcact1b
 ! ## Code is based on ISORROPIA II, obtained from the CMAQ air-quality
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
-subroutine mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3, lwn, gama, t)
+subroutine mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3, lwn, gama, t, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -7997,9 +8017,10 @@ subroutine mach_hetp_calcact2(h, nh4_t, so4_t, hso4, no3, lwn, gama, t)
    real(dp),       intent(in) :: h       
    real(dp),       intent(in) :: t       
    real(dp),       intent(inout) :: gama(13)
-!
+   real(dp),       intent(inout):: ionic
+   !
 !  ## Local variables:
-   real(dp)    :: ionic, sion, tc, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: ff11, ff13, f2a2, f2a3, f2a4, ch1, ch2
    real(dp)    :: h2, k1, k2, k3, f11, f12, f13
@@ -8154,7 +8175,7 @@ end subroutine mach_hetp_calcact2
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcact2b(h, nh4_t, so4_t, hso4, no3, lwn, gama, t, soln,   &
-                               frst, calain, calou)
+                               frst, calain, calou, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -8171,9 +8192,10 @@ subroutine mach_hetp_calcact2b(h, nh4_t, so4_t, hso4, no3, lwn, gama, t, soln,  
    logical,        intent(in) :: frst    
    logical,        intent(in) :: calain  
    logical,        intent(in) :: calou   
-!
+   real(dp),       intent(inout):: ionic
+   !
 !  ## Local variables:
-   real(dp)    :: ionic, sion, tc, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: ff11, ff13, f2a2, f2a3, f2a4, ch1, ch2
    real(dp)    :: h2, k1, k2, k3, f11, f12, f13
@@ -8332,7 +8354,7 @@ end subroutine mach_hetp_calcact2b
 ! ## Code is based on ISORROPIA II, obtained from the CMAQ air-quality
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
-subroutine mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3, cl, na, lwn, gama, t)
+subroutine mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3, cl, na, lwn, gama, t, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -8347,9 +8369,10 @@ subroutine mach_hetp_calcact3(h, nh4_t, so4_t, hso4, no3, cl, na, lwn, gama, t)
    real(dp),       intent(in) :: h      
    real(dp),       intent(in) :: t       
    real(dp),       intent(inout) :: gama(13)
-!
+   real(dp),       intent(inout) :: ionic
+   !
 !  ## Local variables:
-   real(dp)    :: ionic, sion, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: f11, f12, f13, f14, k1, k2, k3, k4, h2
    real(dp)    :: f21, f22, f23, ch1, ch2
@@ -8557,7 +8580,7 @@ end subroutine mach_hetp_calcact3
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3, cl, na,     &
-                              lwn, gama, t, soln, frst, calain, calou)
+                              lwn, gama, t, soln, frst, calain, calou, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -8575,10 +8598,11 @@ subroutine mach_hetp_calcact3b(h, nh4_t, so4_t, hso4, no3, cl, na,     &
    real(dp),       intent(inout) :: gama    (13)
    logical,        intent(in) :: frst    
    logical,        intent(in) :: calain  
-   logical,        intent(in) :: calou   
+   logical,        intent(in) :: calou
+   real(dp),       intent(inout):: ionic
 !
 !  ## Local variables:
-   real(dp)    :: ionic, sion, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: f11, f12, f13, f14, k1, k2, k3, k4, h2
    real(dp)    :: f21, f22, f23, ch1, ch2
@@ -8790,7 +8814,7 @@ end subroutine mach_hetp_calcact3b
 ! ## model (https://github.com/USEPA/CMAQ/tree/main/CCTM/src/aero/aero6)
 !############################################################################
 subroutine mach_hetp_calcact4(h, nh4_t, so4_t, hso4, no3, cl, na,     &
-                              ca, pk, mg, lwn, gama, t)
+                              ca, pk, mg, lwn, gama, t, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -8808,10 +8832,11 @@ subroutine mach_hetp_calcact4(h, nh4_t, so4_t, hso4, no3, cl, na,     &
    real(dp),    intent   (in) :: h      
    real(dp),    intent   (in) :: t       
    real(dp),    intent(inout) :: gama    (23)
-!
+   real(dp),    intent(inout) :: ionic
+   !
 !  ## Local variables:
 !
-   real(dp)    :: ionic, sion, tc, tx, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, tx, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: f11, f12, f13, f14, k1, k2, k3, k4, h2, h3
    real(dp)    :: f21, f22, f23, ch1, ch2, ch3
@@ -9144,7 +9169,7 @@ end subroutine mach_hetp_calcact4
 !############################################################################
 subroutine mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3, cl, na,     &
                                ca, pk, mg, lwn, gama, t, soln, frst,   &
-                               calain, calou)
+                               calain, calou, ionic)
 !
    use mach_hetp_mod,         only: tiny, tiny2, dp, sp
    implicit none
@@ -9165,11 +9190,12 @@ subroutine mach_hetp_calcact4b(h, nh4_t, so4_t, hso4, no3, cl, na,     &
    logical,     intent   (in) :: soln 
    logical,     intent   (in) :: frst    
    logical,     intent   (in) :: calain  
-   logical,     intent   (in) :: calou   
+   logical,     intent   (in) :: calou
+   real(dp),    intent(inout) :: ionic
 !
 !  ## Local variables:
 !
-   real(dp)    :: ionic, sion, tc, tx, c, xx, xx2, c1, c2, hh
+   real(dp)    :: sion, tc, tx, c, xx, xx2, c1, c2, hh
    real(dp)    :: c3, c4, c5, c5a
    real(dp)    :: f11, f12, f13, f14, k1, k2, k3, k4, h2, h3
    real(dp)    :: f21, f22, f23, ch1, ch2, ch3
