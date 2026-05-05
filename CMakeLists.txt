@@ -75,12 +75,23 @@ set(HETP_Fortran_FLAGS_DEBUG_Intel
    CACHE STRING "HETP compiler flags for build type debug with Intel compilers"
 )
 
-set(HETP_Fortran_FLAGS_GNU
-   -cpp -w -std=legacy -fautomatic -fno-align-commons -fconvert=big-endian
-   -fno-range-check -mcmodel=medium -fbacktrace -g -DLINUX_GFORTRAN
-   -ffree-line-length-none
-   CACHE STRING "HETP compiler flags for all build types with GNU compilers"
-)
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+    # arm based processors only support mcmodels of large small tiny
+    set(HETP_Fortran_FLAGS_GNU
+       -cpp -w -std=legacy -fautomatic -fno-align-commons -fconvert=big-endian
+       -fno-range-check -mcmodel=small -fbacktrace -g -DLINUX_GFORTRAN
+       -ffree-line-length-none
+       CACHE STRING "HETP compiler flags for all build types with GNU compilers"
+    )
+else()
+    set(HETP_Fortran_FLAGS_GNU
+       -cpp -w -std=legacy -fautomatic -fno-align-commons -fconvert=big-endian
+       -fno-range-check -mcmodel=medium -fbacktrace -g -DLINUX_GFORTRAN
+       -ffree-line-length-none
+       CACHE STRING "HETP compiler flags for all build types with GNU compilers"
+    )
+endif()
+
 set(HETP_Fortran_FLAGS_RELEASE_GNU
    -O3 -funroll-loops
    CACHE STRING "HETP compiler flags for build type release with GNU compilers"
