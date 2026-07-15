@@ -60,6 +60,7 @@ set(HETP_DETECTED_FORTRAN_COMPILER_VERSION ${CMAKE_Fortran_COMPILER_VERSION}
 set(HETP_Fortran_FLAGS_Intel
    -cpp -w -auto -noalign "SHELL:-convert big_endian" "SHELL:-fp-model source" -mcmodel=medium
    -shared-intel -traceback -DLINUX_IFORT
+   "SHELL:-diag-disable=10448"
    CACHE STRING "HETP compiler flags for all build types with Intel compilers"
 )
 set(HETP_Fortran_FLAGS_RELEASE_Intel
